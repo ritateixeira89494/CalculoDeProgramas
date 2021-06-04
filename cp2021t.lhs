@@ -1025,25 +1025,40 @@ outExpAr (Bin binop a b) = i2 $ i2 $ i1(binop,(a,b))
 recExpAr f = baseExpAr id id id f f id f
 
 ---
-g_eval_exp (Bin binop a b) = if (binop == Sum) then (a + b)
-												else (a * b)
-g_eval_exp (Un unop a) = if (unop == Negate) then (Un Negate a)
-											else (Prelude.exp a)
-g_eval_exp x = x
+
+g_eval x = x
+
+g_eval_bin (binop,(a,b)) = if (binop == Sum) then (a + b)
+                                             else (a * b)
+
+g_eval_un (unop,a) = if (unop == Negate) then (-a)
+                                         else (Prelude.exp a)
+
+g_eval_exp f = either (const f) (either g_eval (either g_eval_bin g_eval_un))
+
 ---
-clean = undefined
+clean f = outExpAr f
+
+
 ---
-gopt = undefined 
+gopt f = g_eval_exp f
+
 \end{code}
 
 \begin{code}
 sd_gen :: Floating a =>
     Either () (Either a (Either (BinOp, ((ExpAr a, ExpAr a), (ExpAr a, ExpAr a))) (UnOp, (ExpAr a, ExpAr a)))) -> (ExpAr a, ExpAr a)
-sd_gen = undefined
+sd_gen = either f1 ( either f2 (either f3 f4) ) where
+            f1 _ = (X, N 0)
+            f2 a = (N a, N 0)
+            f3 (binop, ((a, b), (c, d))) = if (binop == Sum) then ((Bin Sum a b),(Bin Sum c d))
+                                                           else ((Bin Product a b),(Bin Product c d))
+            f4 (unop, (a, b)) = if (unop == Negate) then (Un Negate a,Un Negate b)
+                                                    else (Un E a, Un E b)
 \end{code}
 
 \begin{code}
-ad_gen = undefined
+ad_gen v = undefined
 \end{code}
 
 \subsection*{Problema 2}
