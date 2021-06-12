@@ -1026,18 +1026,18 @@ recExpAr f = baseExpAr id id id f f id f
 
 ---
 
-g_eval x = x
-
+g_eval_exp f = either (const f) (either g_eval (either g_eval_bin g_eval_un))
+g_eval = id
 g_eval_bin (binop,(a,b)) = if (binop == Sum) then (a + b)
                                              else (a * b)
-
 g_eval_un (unop,a) = if (unop == Negate) then (-a)
-                                         else (Prelude.exp a)
+                                         else (expd a)
 
-g_eval_exp f = either (const f) (either g_eval (either g_eval_bin g_eval_un))
 
 ---
-clean f = outExpAr f
+clean (Bin Product _ (N 0)) = outExpAr $ N 0
+clean (Bin Product (N 0) _) = outExpAr $ N 0
+clean x = outExpAr x
 
 
 ---
@@ -1049,16 +1049,21 @@ gopt f = g_eval_exp f
 sd_gen :: Floating a =>
     Either () (Either a (Either (BinOp, ((ExpAr a, ExpAr a), (ExpAr a, ExpAr a))) (UnOp, (ExpAr a, ExpAr a)))) -> (ExpAr a, ExpAr a)
 sd_gen = either f1 ( either f2 (either f3 f4) ) where
-            f1 _ = (X, N 0)
+            f1 _ = (X, N 1)
             f2 a = (N a, N 0)
-            f3 (binop, ((a, b), (c, d))) = if (binop == Sum) then ((Bin Sum a b),(Bin Sum c d))
-                                                           else ((Bin Product a b),(Bin Product c d))
+            f3 (binop, ((a, b), (c, d))) = if (binop == Sum) then ((Bin Sum a c),(Bin Sum b d))
+                                                             else (Bin Product a c,Bin Sum (Bin Product a d) (Bin Product b c))
             f4 (unop, (a, b)) = if (unop == Negate) then (Un Negate a,Un Negate b)
-                                                    else (Un E a, Un E b)
+                                                    else (Un E a, Bin Product (Un E a) b)
 \end{code}
 
 \begin{code}
-ad_gen v = undefined
+ad_gen v _ = (X, 1)
+ad_gen v n = (n,0)
+ad_gen v (Sum, ((a, b), (c, d))) = (a+c,b+d)
+ad_gen v (binop, ((a, b), (c, d))) = if (binop == Sum) then (a+c,b+d) else (a*c,a*d+b*c)
+ad_gen v (unop, (a, b)) = if (unop == Negate) then (-a,-b) else (expd a, (expd a) * b)
+
 \end{code}
 
 \subsection*{Problema 2}
