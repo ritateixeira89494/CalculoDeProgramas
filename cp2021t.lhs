@@ -1064,6 +1064,7 @@ ad_gen v (Right(Right(Left (binop, ((a, b), (c, d))) ) ) ) | (binop == Sum) = (a
                                                            | otherwise = (a * c ,(a * d) + (b * c))
 ad_gen v (Right ( Right( Right (unop, (a, b))))) | (unop == Negate) = (-a, -b)
                                                  | otherwise = (expd a, (expd a) * b)
+-- we did it, joe
 
 
 
