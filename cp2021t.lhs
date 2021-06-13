@@ -129,9 +129,9 @@
 \begin{tabular}{ll}
 \textbf{Grupo} nr. & 999 (preencher)
 \\\hline
-a11111 & Nome1 (Rita <3)	
+a89494 & Rita Celeste Perucho Teixeira	
 \\
-a22222 & Nome2 (preencher)	
+a89476 & Bruno Alexandre Martins Carvalho	
 \\
 a33333 & Nome3 (preencher)	
 \\
@@ -832,7 +832,7 @@ Algoritmo:
 deCasteljau :: [NPoint] -> OverTime NPoint
 deCasteljau [] = nil
 deCasteljau [p] = const p
-deCasteljau l = \pt -> (calcLine (p pt) (q pt)) pt where
+deCasteljau l = \pt -> (calcLine (p pt) (q pt)) pt where 
   p = deCasteljau (init l)
   q = deCasteljau (tail l)
 \end{spec}
@@ -1016,6 +1016,15 @@ ad v = p2 . cataExpAr (ad_gen v)
 \end{code}
 Definir:
 
+
+\textbf{outExpAr}
+\begin{eqnarray*}
+
+\end{eqnarray*}
+
+
+Finalmente pelo enunciado e pelo desenvolvimento repetitivo das regras obtemos a solução seguinte
+
 \begin{code}
 outExpAr X = i1()
 outExpAr (N x) = i2 $ i1 x
@@ -1049,7 +1058,7 @@ gopt f = g_eval_exp f
 sd_gen :: Floating a =>
     Either () (Either a (Either (BinOp, ((ExpAr a, ExpAr a), (ExpAr a, ExpAr a))) (UnOp, (ExpAr a, ExpAr a)))) -> (ExpAr a, ExpAr a)
 sd_gen = either f1 ( either f2 (either f3 f4) ) where
-            f1 b = (X, N 1)
+            f1 _ = (X, N 1)
             f2 a = (N a, N 0)
             f3 (binop, ((a, b), (c, d))) | (binop == Sum) = ((Bin Sum a c),(Bin Sum b d))
                                          | otherwise = (Bin Product a c, Bin Sum (Bin Product a d) (Bin Product b c))
@@ -1060,20 +1069,20 @@ sd_gen = either f1 ( either f2 (either f3 f4) ) where
 \begin{code}
 ad_gen v (Left()) = (v, 1)
 ad_gen v (Right(Left a)) = (a, 0)
-ad_gen v (Right(Right(Left (binop, ((a, b), (c, d))) ) ) ) | (binop == Sum) = (a + c, b + d)
-                                                           | otherwise = (a * c ,(a * d) + (b * c))
+ad_gen v (Right(Right(Left (binop, ((a, b), (c, d)) ) ) ) ) | (binop == Sum) = (a + c, b + d)
+                                                            | otherwise = (a * c ,(a * d) + (b * c))
 ad_gen v (Right ( Right( Right (unop, (a, b))))) | (unop == Negate) = (-a, -b)
                                                  | otherwise = (expd a, (expd a) * b)
--- we did it, joe
 
 
 
 \end{code}
 
+
 \subsection*{Problema 2}
 Definir
 \begin{code}
-loop = (a,auxd,auxe,b,auxb,c,auxc) = (auxd*auxe*a,2+auxd,2+auxe,auxb*b,1+auxb,auxc*c,1+auxc)
+loop (a,auxd,auxe,b,auxb,c,auxc) = (auxd*auxe*a,2+auxd,2+auxe,auxb*b,1+auxb,auxc*c,1+auxc)
 inic =(1,2,1,1,2,1,1)
 prj  (a,auxd,auxe,b,auxb,c,auxc) =  div a (b*c)
 \end{code}
@@ -1085,19 +1094,28 @@ seja a função pretendida.
 \textbf{NB}: usar divisão inteira.
 Apresentar de seguida a justificação da solução encontrada.
 
+
+
 \subsection*{Problema 3}
 
 \begin{code}
 calcLine :: NPoint -> (NPoint -> OverTime NPoint)
 calcLine = cataList h where
-   h = undefined
+   h = either (\lambda ponto -> nil) auxCalcLine
+
+
+auxCalcLine (d,f) l = case l of
+                          []     -> nil
+                          (x:xs) -> \z -> concat $ (sequenceA [singl . linear1d d x, f xs]) z
 
 deCasteljau :: [NPoint] -> OverTime NPoint
-deCasteljau = hyloAlgForm alg coalg where
+deCasteljau = hyloAlgForm alg coalg where 
    coalg = undefined
    alg = undefined
 
-hyloAlgForm = undefined
+bezieraux l = \z -> (fromRational >< fromRational) . (\[x, y] -> (x, y)) $ ((deCasteljau l) z)
+
+hyloAlgForm alg coalg = (calcLine alg) . (coalg)
 \end{code}
 
 \subsection*{Problema 4}
