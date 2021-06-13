@@ -1069,9 +1069,9 @@ ad_gen v (unop, (a, b)) = if (unop == Negate) then (-a,-b) else (expd a, (expd a
 \subsection*{Problema 2}
 Definir
 \begin{code}
-loop = undefined
-inic = undefined
-prj = undefined
+loop = (a,auxd,auxe,b,auxb,c,auxc) = (auxd*auxe*a,2+auxd,2+auxe,auxb*b,1+auxb,auxc*c,1+auxc)
+inic =(1,2,1,1,2,1,1)
+prj  (a,auxd,auxe,b,auxb,c,auxc) =  div a (b*c)
 \end{code}
 por forma a que
 \begin{code}
