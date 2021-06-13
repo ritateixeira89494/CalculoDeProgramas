@@ -1049,20 +1049,23 @@ gopt f = g_eval_exp f
 sd_gen :: Floating a =>
     Either () (Either a (Either (BinOp, ((ExpAr a, ExpAr a), (ExpAr a, ExpAr a))) (UnOp, (ExpAr a, ExpAr a)))) -> (ExpAr a, ExpAr a)
 sd_gen = either f1 ( either f2 (either f3 f4) ) where
-            f1 _ = (X, N 1)
+            f1 b = (X, N 1)
             f2 a = (N a, N 0)
-            f3 (binop, ((a, b), (c, d))) = if (binop == Sum) then ((Bin Sum a c),(Bin Sum b d))
-                                                             else (Bin Product a c,Bin Sum (Bin Product a d) (Bin Product b c))
-            f4 (unop, (a, b)) = if (unop == Negate) then (Un Negate a,Un Negate b)
-                                                    else (Un E a, Bin Product (Un E a) b)
+            f3 (binop, ((a, b), (c, d))) | (binop == Sum) = ((Bin Sum a c),(Bin Sum b d))
+                                         | otherwise = (Bin Product a c, Bin Sum (Bin Product a d) (Bin Product b c))
+            f4 (unop, (a, b)) | (unop == Negate) = (Un Negate a,Un Negate b)
+                              | otherwise = (Un E a, Bin Product (Un E a) b)
 \end{code}
 
 \begin{code}
-ad_gen v _ = (X, 1)
-ad_gen v n = (n,0)
-ad_gen v (Sum, ((a, b), (c, d))) = (a+c,b+d)
-ad_gen v (binop, ((a, b), (c, d))) = if (binop == Sum) then (a+c,b+d) else (a*c,a*d+b*c)
-ad_gen v (unop, (a, b)) = if (unop == Negate) then (-a,-b) else (expd a, (expd a) * b)
+ad_gen v (Left()) = (v, 1)
+ad_gen v (Right(Left a)) = (a, 0)
+ad_gen v (Right(Right(Left (binop, ((a, b), (c, d))) ) ) ) | (binop == Sum) = (a + c, b + d)
+                                                           | otherwise = (a * c ,(a * d) + (b * c))
+ad_gen v (Right ( Right( Right (unop, (a, b))))) | (unop == Negate) = (-a, -b)
+                                                 | otherwise = (expd a, (expd a) * b)
+
+
 
 \end{code}
 
