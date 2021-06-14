@@ -1014,16 +1014,84 @@ sd = p2 . cataExpAr sd_gen
 ad :: Floating a => a -> ExpAr a -> a
 ad v = p2 . cataExpAr (ad_gen v)
 \end{code}
-Definir:
 
+\subsubsection{Resolução e respetiva explicação}
+
+Para a maior parte do Problema 1, tivemos que nos familiarizar com os conceitos de Hilomorfismo, Anamorfismo e (o mais utilizado e trabalhado) Catamorfismo. A sua estrutura em diagrama generalizada é a seguinte:
+\begin{eqnarray}
+\xymatrixcolsep{2cm}\xymatrixrowsep{2cm}
+\centerline{\xymatrix{
+   |Nat0| \ar[d]_-{|cata g|}
+                \ar@@/^2pc/ [rr]^-{|out|} & \qquad \cong
+&   1+|Nat0| \ar[d]^{|id + (cata g)|}
+                                     \ar@@/^2pc/ [ll]^-{|in|}
+                                     \\
+    |A| &  & 1 + |A| \ar[ll]^-{|g|}
+}}
+\end{eqnarray}
+
+
+Diagrama do catamorfismo adaptado à função recExpAr:
+
+\begin{eqnarray}
+\xymatrixcolsep{1.5cm}\xymatrixrowsep{5pc}
+\centerline{\xymatrix{
+   ExpAr A \ar[d]_-{|cata g|}
+                \ar@@/^2pc/ [rr]^-{|out|} & \qquad \cong
+&   1 + (A + (BinOp \times (ExpAr A \times ExpAr A)) + (UnOp \times ExpAr A)) \ar[d]^{|id + (id + (id >< ((cata g) >< (cata g)) + id >< (cata g))))|}
+                                     \ar@@/^2pc/ [ll]^-{|in|}
+                                     \\
+    |a| &  & 1 + (a + ((BinOp \times (a \times a)) + UnOp \times a))\ar[ll]^-{|g|}
+}}
+\end{eqnarray}
+
+
+Definir:
 
 \textbf{outExpAr}
 \begin{eqnarray*}
-
+\start
+	|out . in = id|
+	\just\equiv{ pelo enunciado }
+		|out . (either (const X) num_ops) = id|
+	\just\equiv{pelo formulário Fusão-+}
+		|either( out . (const X)) (out . num_ops) = id|
+	\just\equiv{ Universal-+ }
+   		|lcbr(
+			id . i1= out . const X
+     	)(
+			id . i2 = out . num_ops
+		)|
+	\just\equiv{ Natural-id }
+   		|lcbr(
+			i1= out . const X
+    	)(
+			i2 = out . num_ops
+		)|
+	\just\equiv{ Igualdade extensional e segundo o enunciado }
+		|lcbr(
+			i1 x1 = (out . const X) x1
+		)(
+			i2 = out . either( N ops)
+		)|
+	\just\equiv{ Def-comp , Def-const, Fusão-+ }
+		|lcbr(
+			i1 = out X
+		)(
+			i2 = out . either( (out . N) (out . ops))
+		)|
+	\just\equiv{ Universal-+ }
+		|lcbr(
+			(i2 . i1) x2 = (out . N) x2
+		)(
+			i2 . i2 = out . ops
+		)|
 \end{eqnarray*}
 
 
-Finalmente pelo enunciado e pelo desenvolvimento repetitivo das regras obtemos a solução seguinte
+
+
+Finalmente pelo enunciado e pelo desenvolvimento repetitivo das regras obtemos a solução seguinte:
 
 \begin{code}
 outExpAr X = i1()
@@ -1031,10 +1099,23 @@ outExpAr (N x) = i2 $ i1 x
 outExpAr (Un unop x) = i2 $ i2 $ i2(unop,x) 
 outExpAr (Bin binop a b) = i2 $ i2 $ i1(binop,(a,b))
 ---
+
+\end{code}
+
+
+\textbf{recExpAr}
+\begin{code}
 recExpAr f = baseExpAr id id id f f id f
 
----
+\end{code}
 
+----
+
+\textbf{g\_eval\_exp}
+
+De modo a resolver o seguinte código foi utilizado o exemplo de catamorfismo referido anteriormente com uma simples alteração da função, sendo esta a eval\_exp.
+
+\begin{code}
 g_eval_exp f = either (const f) (either g_eval (either g_eval_bin g_eval_un))
 g_eval = id
 g_eval_bin (binop,(a,b)) = if (binop == Sum) then (a + b)
@@ -1042,17 +1123,36 @@ g_eval_bin (binop,(a,b)) = if (binop == Sum) then (a + b)
 g_eval_un (unop,a) = if (unop == Negate) then (-a)
                                          else (expd a)
 
+\end{code}
 
----
+----
+
+\textbf{clean}
+
+A função clean é uma função que tira proveito de outra resolvida anteriormente, no entanto vimo\-nos forçados a tratar alguns casos específicos, nomeadamente a multiplicação por 0 e o caso de e\^\ 0.
+
+
+\begin{code}
 clean (Bin Product _ (N 0)) = outExpAr $ N 0
 clean (Bin Product (N 0) _) = outExpAr $ N 0
+clean (Un E (N 0)) = outExpAr $ N 1
 clean x = outExpAr x
+\end{code}
 
+----
 
----
+\textbf{Optimize}
+\begin{code}
+
 gopt f = g_eval_exp f
 
 \end{code}
+
+----
+
+\textbf{sd\_gen}
+
+Com o intuito de resolver o sd\_gen, foram utilizadas as regras da soma e do produto previamente fornecidas neste mesmo relatório. O objetivo desta função é aplicar tais fórmulas às diferentes formas como a \textit{ExpAr} pode ser apresentada.
 
 \begin{code}
 sd_gen :: Floating a =>
@@ -1065,6 +1165,12 @@ sd_gen = either f1 ( either f2 (either f3 f4) ) where
             f4 (unop, (a, b)) | (unop == Negate) = (Un Negate a,Un Negate b)
                               | otherwise = (Un E a, Bin Product (Un E a) b)
 \end{code}
+
+
+\textbf{ad\_gen}
+
+A função ad\_gen tem o mesmo objetivo da função criada anteriormente, porém já são aplicados valores específicos (não nos ficamos pelas expressões matemáticas).
+
 
 \begin{code}
 ad_gen v (Left()) = (v, 1)
@@ -1098,6 +1204,9 @@ Apresentar de seguida a justificação da solução encontrada.
 
 \subsection*{Problema 3}
 
+Utilizando a função calcLine para calcular as curvas de Bézier, necessitamos de mais que um ponto que constitui a mesma. Assim, para construirmos a função calcLine tivemos que considerar isso mesmo: caso fosse fornecido apenas um ponto, a função iria retornar nulo; caso contrário, utilizamos uma função auxiliar que segue o código fornecido no relatório pelos docentes.
+De modo a compreender melhor a função auxiliar, esta é feita como uma versão do cataList da classe \emph{List.hs}.
+
 \begin{code}
 calcLine :: NPoint -> (NPoint -> OverTime NPoint)
 calcLine = cataList h where
@@ -1107,15 +1216,30 @@ calcLine = cataList h where
 auxCalcLine (d,f) l = case l of
                           []     -> nil
                           (x:xs) -> \z -> concat $ (sequenceA [singl . linear1d d x, f xs]) z
+\end{code}
+
+Tomando como ponto de partida as LTrees, uma vez que são próximas daquilo que é o retorno pedido e na classe \emph{LTree.hs}, constatámos a existência da função mSort, que é um divide and conquer, podemos seguir então esse método. Começando então por fazer uma função auxiliar do gene do anamorfismo (alg) e, posteriormente, o gene do catamorfismo (coAlg), este último através do nos é fornecido pelos docentes, utilizando o calcLine.
+
+Por fim, obtemos o resultado seguinte:
+
+\begin{code}
 
 deCasteljau :: [NPoint] -> OverTime NPoint
 deCasteljau = hyloAlgForm alg coalg where 
-   coalg = undefined
-   alg = undefined
+   coalg = cataLTree castelCoalgAux
+   alg = anaLTree castelAlgAux
 
-bezieraux l = \z -> (fromRational >< fromRational) . (\[x, y] -> (x, y)) $ ((deCasteljau l) z)
+castelAlgAux [] = i1 nil
+castelAlgAux [p] = i1 (const p)
+castelAlgAux l = i2 ((init l), (tail l))
 
-hyloAlgForm alg coalg = (calcLine alg) . (coalg)
+castelCoalgAux = either aux1 aux2
+
+aux1 l = l
+aux2 (p,q) = \pt -> (calcLine (p pt) (q pt)) pt
+
+hyloAlgForm f g = g . f
+
 \end{code}
 
 \subsection*{Problema 4}
