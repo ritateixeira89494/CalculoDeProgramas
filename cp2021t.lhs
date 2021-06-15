@@ -133,7 +133,7 @@ a89494 & Rita Celeste Perucho Teixeira
 \\
 a89476 & Bruno Alexandre Martins Carvalho	
 \\
-a33333 & Nome3 (preencher)	
+a81366 & João Nuno Costa Neves 	
 \\
 a44444 & Nome4 (preencher, se aplicÃ¡vel, ou apagar)	
 \end{tabular}
@@ -1186,8 +1186,34 @@ ad_gen v (Right ( Right( Right (unop, (a, b))))) | (unop == Negate) = (-a, -b)
 
 
 \subsection*{Problema 2}
+\begin{
+\begin{verbatim}
+a 0 = 1 
+a (n+1) = auxd*auxe*a
+
+auxd 0 = 2
+auxd (n+1) = 2 + auxd
+
+auxe 0 = 1
+auxe (n+1) = 2+auxe
+
+b 0 = 1
+b (n+1) =auxb*b
+
+auxb 0 = 2
+auxb (n+1) = 1+ auxb
+
+c 0 = 1
+c (n+1) = auxc*c
+
+auxc 0 = 1
+auxc (n+1) = 1+auxc
+ 
+ Finalmente, o resultado é calculado no final, recebendo o resultado das funções 'a' 'b' e 'c' , que se encontram em recursividade múltipla.
+\end{verbatim}
 Definir
 \begin{code}
+
 loop (a,auxd,auxe,b,auxb,c,auxc) = (auxd*auxe*a,2+auxd,2+auxe,auxb*b,1+auxb,auxc*c,1+auxc)
 inic =(1,2,1,1,2,1,1)
 prj  (a,auxd,auxe,b,auxb,c,auxc) =  div a (b*c)
@@ -1250,7 +1276,12 @@ avg = p1.avg_aux
 \end{code}
 
 \begin{code}
-avg_aux = undefined
+outLL [a]= i1 (a)
+outLL (h:t)= i2(h,t)
+cataLL g = g . recList(cataLL g) . outLL
+
+avg_aux =  cataLL(either(split(id) (const 1)) (split(alfa) (succ . p2 .p2))) where
+                                       alfa(a,(avg,l))=((a+(avg*l))/(l+1)) 
 \end{code}
 SoluÃ§Ã£o para Ã¡rvores de tipo \LTree:
 \begin{code}
