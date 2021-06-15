@@ -705,7 +705,7 @@ a menos de um erro de 0.1 milésimas:
 prop_avg = nonempty .==>. diff .<=. const 0.000001 where
    diff l = avg l - (avgLTree . genLTree) l
    genLTree = anaLTree lsplit
-   nonempty = undefined -- (>[]) I DON'T KNOW BITCH SEE LATER!
+   nonempty = undefined
 \end{code}
 \end{propriedade}
 
