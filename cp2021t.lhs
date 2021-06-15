@@ -133,7 +133,7 @@ a89494 & Rita Celeste Perucho Teixeira
 \\
 a89476 & Bruno Alexandre Martins Carvalho	
 \\
-a81366 & Jo�o Nuno Costa Neves 	
+a81366 & Jo? Nuno Costa Neves 	
 \\
 a44444 & Nome4 (preencher, se aplicável, ou apagar)	
 \end{tabular}
@@ -1129,7 +1129,7 @@ g_eval_un (unop,a) = if (unop == Negate) then (-a)
 
 \textbf{clean}
 
-A função clean é uma função que tira proveito de outra resolvida anteriormente, no entanto vimo\-nos forçados a tratar alguns casos específicos, nomeadamente a multiplicação por 0 e o caso de e\^\ 0.
+A função clean é uma função que tira proveito de outra resolvida anteriormente, no entanto vimo\-nos forçados a tratar alguns casos específicos, nomeadamente a multiplicação por 0 e o caso de $|e|^{0}$.
 
 
 \begin{code}
@@ -1156,7 +1156,8 @@ Com o intuito de resolver o sd\_gen, foram utilizadas as regras da soma e do pro
 
 \begin{code}
 sd_gen :: Floating a =>
-    Either () (Either a (Either (BinOp, ((ExpAr a, ExpAr a), (ExpAr a, ExpAr a))) (UnOp, (ExpAr a, ExpAr a)))) -> (ExpAr a, ExpAr a)
+    Either () (Either a (Either (BinOp, ((ExpAr a, ExpAr a), (ExpAr a, ExpAr a))) (UnOp, (ExpAr a, ExpAr a)))) 
+    -> (ExpAr a, ExpAr a)
 sd_gen = either f1 ( either f2 (either f3 f4) ) where
             f1 _ = (X, N 1)
             f2 a = (N a, N 0)
@@ -1186,7 +1187,9 @@ ad_gen v (Right ( Right( Right (unop, (a, b))))) | (unop == Negate) = (-a, -b)
 
 
 \subsection*{Problema 2}
-\begin{
+
+Definir:
+
 \begin{verbatim}
 a 0 = 1 
 a (n+1) = auxd*auxe*a
@@ -1208,13 +1211,15 @@ c (n+1) = auxc*c
 
 auxc 0 = 1
 auxc (n+1) = 1+auxc
- 
- Finalmente, o resultado � calculado no final, recebendo o resultado das fun��es 'a' 'b' e 'c' , que se encontram em recursividade m�ltipla.
 \end{verbatim}
-Definir
+
+Finalmente, o resultado calculado no final, recebendo o resultado das fun?es 'a' 'b' e 'c' , que se encontram em recursividade múltipla.
+
+
 \begin{code}
 
-loop (a,auxd,auxe,b,auxb,c,auxc) = (auxd*auxe*a,2+auxd,2+auxe,auxb*b,1+auxb,auxc*c,1+auxc)
+loop (a,auxd,auxe,b,auxb,c,auxc) = 
+                    (auxd*auxe*a,2+auxd,2+auxe,auxb*b,1+auxb,auxc*c,1+auxc)
 inic =(1,2,1,1,2,1,1)
 prj  (a,auxd,auxe,b,auxb,c,auxc) =  div a (b*c)
 \end{code}
@@ -1269,6 +1274,51 @@ hyloAlgForm f g = g . f
 \end{code}
 
 \subsection*{Problema 4}
+
+\begin{eqnarray}
+\xymatrixcolsep{1.5cm}\xymatrixrowsep{5pc}
+\centerline{\xymatrix{
+   A^{+} \ar[d]_-{|avg|}
+                \ar@@/^2pc/ [rr]^-{|out = |in^{0} } & \qquad \cong
+&   A + A \times A^{+} \ar[d]^{|id + (id + id >< <avg,len>)|}
+                                     \ar@@/^2pc/ [ll]^-{|in = [singl, cons]|}
+                                     \\
+    A &  & A + A \times (A \times A) \ar[ll]^-{|id| , \alpha}
+}}
+\end{eqnarray}
+
+\begin{eqnarray}
+\alpha :: A \times (A \times A) \rightarrow A
+\end{eqnarray}
+\begin{eqnarray}
+\alpha |(a, (avg, l))| = |(a + (avg >< l) / (l + 1))|
+\end{eqnarray}
+
+\begin{eqnarray}
+\xymatrixcolsep{1.5cm}\xymatrixrowsep{5pc}
+\centerline{\xymatrix{
+   A^{+} \ar[d]_-{|length|}
+                \ar@@/^2pc/ [rr]^-{|out = |in^{0} } & \qquad \cong
+&   1 + A \times A^{+} \ar[d]^{|id + id >< lenght|}
+                                     \ar@@/^2pc/ [ll]^-{|in = [nil, cons]|}
+                                     \\
+    A &  & 1 + A \times A \ar[ll]^-{|[1, succ . n2]|}
+}}
+\end{eqnarray}
+
+Posteriormente,
+
+\begin{eqnarray}
+\xymatrixcolsep{1.5cm}\xymatrixrowsep{5pc}
+\centerline{\xymatrix{
+   A^{+} \ar[d]_-{|length|}
+                \ar@@/^2pc/ [rr]^-{|out = |in^{0} } & \qquad \cong
+&   A + A \times A^{+} \ar[d]^{|id + id >< <avg,len>)|}
+                                     \ar@@/^2pc/ [ll]^-{|in = [singl, cons]|}
+                                     \\
+    A &  & A + A \times (A \times A) \ar[ll]^-{|[1, succ . n2]|}
+}}
+\end{eqnarray}
 
 Solução para listas não vazias:
 \begin{code}
