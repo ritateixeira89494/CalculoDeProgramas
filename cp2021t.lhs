@@ -127,13 +127,13 @@
 
 \begin{center}\large
 \begin{tabular}{ll}
-\textbf{Grupo} nr. & 999 (preencher)
+\textbf{Grupo} nr. & 91
 \\\hline
 a89494 & Rita Celeste Perucho Teixeira	
 \\
 a89476 & Bruno Alexandre Martins Carvalho	
 \\
-a81366 & Jo? Nuno Costa Neves 	
+a81366 & João Nuno Costa Neves 	
 \\
 a44444 & Nome4 (preencher, se aplicável, ou apagar)	
 \end{tabular}
@@ -1352,9 +1352,20 @@ Inserir em baixo o código \Fsharp\ desenvolvido, entre \verb!\begin{verbatim}! 
 \printindex
 
 %----------------- Bibliografia (exige bibtex) --------------------------------%
-
+\section{Bibliografia}
 \bibliographystyle{plain}
 \bibliography{cp2021t}
+
+\href{https://haslab.github.io/CP/}{Site principal da Unidade Curricular}
+
+\href{https://www.di.uminho.pt/~jno/ps/pdbc.pdf}{Program Design by Calculation}
+
+\href{https://retro-freedom.nz/haskell-magic-hylomorphisms-and-divide-and-conquer.html}{Conceito de Divide\&Conquer no conceito de Hilomorfismos}
+
+\href{https://garsia.math.yorku.ca/MPWP/LATEXmath/latexsym.html}{Mathematical symbols for Latex}
+
+\href{https://www.jmilne.org/not/Mxymatrix.pdf}{Construir matrizes em Latex}
+
 
 %----------------- Fim do documento -------------------------------------------%
 \end{document}
