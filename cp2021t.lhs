@@ -135,7 +135,7 @@ a89476 & Bruno Alexandre Martins Carvalho
 \\
 a81366 & João Nuno Costa Neves 	
 \\
-a44444 & Nome4 (preencher, se aplicável, ou apagar)	
+a87978 & Tiago Miguel Carvalho e Cunha
 \end{tabular}
 \end{center}
 
@@ -705,7 +705,7 @@ a menos de um erro de 0.1 milésimas:
 prop_avg = nonempty .==>. diff .<=. const 0.000001 where
    diff l = avg l - (avgLTree . genLTree) l
    genLTree = anaLTree lsplit
-   nonempty = undefined
+   nonempty = (>[])
 \end{code}
 \end{propriedade}
 
@@ -1257,17 +1257,15 @@ Por fim, obtemos o resultado seguinte:
 
 deCasteljau :: [NPoint] -> OverTime NPoint
 deCasteljau = hyloAlgForm alg coalg where 
-   coalg = cataLTree castelCoalgAux
+   coalg = cataLTree (either aux1 aux2)
    alg = anaLTree castelAlgAux
+
+aux1 l = l
+aux2 (p,q) = \pt -> (calcLine (p pt) (q pt)) pt
 
 castelAlgAux [] = i1 nil
 castelAlgAux [p] = i1 (const p)
 castelAlgAux l = i2 ((init l), (tail l))
-
-castelCoalgAux = either aux1 aux2
-
-aux1 l = l
-aux2 (p,q) = \pt -> (calcLine (p pt) (q pt)) pt
 
 hyloAlgForm f g = g . f
 
@@ -1333,10 +1331,19 @@ cataLL g = g . recList(cataLL g) . outLL
 avg_aux =  cataLL(either(split(id) (const 1)) (split(alfa) (succ . p2 .p2))) where
                                        alfa(a,(avg,l))=((a+(avg*l))/(l+1)) 
 \end{code}
+
 Solução para árvores de tipo \LTree:
+
+No caso das LTree estamos perante dois casos. Se apenas tivermos o elemento da raiz da arvore, o input será o próprio elemento e o output será um par onde a primeira componente, que corresponde à média da árvore, será o próprio elemento e a segunda componente, que corresponde ao comprimento da árvore, será 1. 
+Se tivermos mais do que só a raiz, o input será um par de pares, em que o primeiro par corresponde à média e ao comprimento da árvore do lado esquerdo e o segundo par à média e ao comprimento da árvore no lado direito. Neste caso o output é um par onde a primeira componente é a soma das multiplicações das médias pelos comprimentos e a segunda a soma dos comprimentos das duas árvores.
+
 \begin{code}
+
 avgLTree = p1.cataLTree gene where
-   gene = undefined
+   gene = either root avgL_aux
+   root a = (a,1)
+   avgL_aux ((a,b),(c,d)) = (((a*b)+(c*d))/(b+d) , b+d)
+
 \end{code}
 
 \subsection*{Problema 5}
